@@ -3,6 +3,8 @@
 ## Description: 
 An in browser game to break the blocks with a bouncing ball.
 
+see it here: https://pete-andrew.github.io/breakout/
+
 [![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
 ## Table of Contents: 
 
