@@ -100,8 +100,6 @@ function drawPlayer() {
     }
 
 //move player 
-//My original move function. Very sticky and unresponsive!
-
 // creates as listener for keydown, then calls the movePlayer function.
 document.addEventListener('keydown', movePlayer);
 document.addEventListener('keyup', stopPlayer);
@@ -114,27 +112,21 @@ function stopPlayer () {
     drawPlayer();
 }
 
-
 function moveLeft (){
-  
     if (currentPosition[0] > 0 && leftKeyDown == true) {
         currentPosition[0] -= 10;   
         drawPlayer();
-        setTimeout(moveLeft, 20);
-
-        //console.log("player moved left");
+        setTimeout(moveLeft, 25);
     } else {
         stopPlayer();
     }
 }
 
-function moveRight (){
-       
+function moveRight (){     
     if (currentPosition[0] < boardWidth - blockWidth && rightKeyDown == true) { 
         currentPosition[0] += 10; 
         drawPlayer();
-        setTimeout(moveRight, 20);
-        //console.log("player moved left");
+        setTimeout(moveRight, 25);
     } else {
         stopPlayer();
     }
@@ -147,8 +139,7 @@ function movePlayer(event) {
     }
     if (event.keyCode == 68) {
         rightKeyDown = true;
-        moveRight();
-        
+        moveRight();     
     } 
 }
 
@@ -161,7 +152,6 @@ function movePlayer(event) {
             //     drawPlayer();
             //     //console.log("player moved left");
 // }
-
 //         case 'ArrowRight': 
 //         case 'd':    
 //             if (currentPosition[0] < boardWidth - blockWidth) { 
@@ -172,8 +162,6 @@ function movePlayer(event) {
 //             break;
 //     }
 // }
-
-
 
 // add ball 
 const ball = document.createElement("div");
@@ -195,7 +183,6 @@ function moveBall () {
 // timer interval sets speed
 timerID = setInterval(moveBall, 10); 
 
-
 function checkForCollisions () {
     // check for block collisions 
     for (let i = 0; i < blocks.length; i++) {
@@ -213,9 +200,7 @@ function checkForCollisions () {
             score++ 
             scoreDisplay.innerHTML = score;
 
-
             //check for win 
-
             if (blocks.length === 0) { 
                 scoreDisplay.innerHTML = "you win!!";
                 clearInterval(timerID);
