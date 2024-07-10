@@ -11,6 +11,8 @@ const ballDiameter = 20;
 let timerID = 0;
 let xDirection = -2;
 let yDirection = 2;
+let leftKeyDown = false;
+let rightKeyDown = false;
 
 let score = 0;
 
@@ -76,11 +78,9 @@ block.style.bottom = blocks[i].bottomLeft[1] + 'px';
 grid.appendChild(block); 
     }
 }
-
 addBlocks(); 
 
 // add player
-
 const player = document.createElement("div");
 player.classList.add("player");
 drawPlayer();
@@ -100,94 +100,82 @@ function drawPlayer() {
     }
 
 //move player 
-//My original move function. Very stick and unresponsive!
-
-function movePlayer(e) {
-    switch(e.key) {
-        case 'ArrowLeft': 
-        case 'a':
-            if (currentPosition[0] > 0) {
-                currentPosition[0] -= 10; 
-                drawPlayer();
-                //console.log("player moved left");
-            }                   
-            break;
-
-        case 'ArrowRight': 
-        case 'd':    
-            if (currentPosition[0] < boardWidth - blockWidth) { 
-                currentPosition[0] += 10; 
-                drawPlayer();
-                //console.log("player moved right");
-            }           
-            break;
-
-    }
-}
-
-// -----------------------
-//this was chatGTP's attempt to speed up the move function. However this didn't seem to improve matters. 
-//needs an increased refresh rate? Not sure how to implement this.
-
-// Add a variable to track the current animation frame
-// let animationFrameId;
-
-// Modify the movePlayer function
-// function movePlayer(e) {
-//     switch (e.key) {
-//         // case 'ArrowLeft':
-//         case 'a':
-//             if (currentPosition[0] > 0) {
-//                 currentPosition[0] -= 10;
-//                 drawPlayer();
-//                 // console.log("player moved left");
-//             }
-//             break;
-
-//         // case 'ArrowRight':
-//         case 'd':
-//             if (currentPosition[0] < boardWidth - blockWidth) {
-//                 currentPosition[0] += 10;
-//                 drawPlayer();
-//                 // console.log("player moved right");
-//             }
-//             break;
-//     }
-
-//     // Cancel the previous animation frame request
-//     cancelAnimationFrame(animationFrameId);
-
-//     // Request a new animation frame
-//     animationFrameId = requestAnimationFrame(() => {
-//         // Your animation logic goes here, if needed
-//     });
-// }
-// ------------------
-
-// Change the event listener to use 'keydown' and 'keyup' events
-// this does more or less the same as the 'movePlayerFunction' but does not draw the player. 
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'a' || e.key === 'd') {
-        movePlayer(e);    
-    }
-});
-
-
-// handle continuous movement using setInterval
-//let movementInterval;
-
-// document.addEventListener('keyup', () => {
-//     // Cancel the animation frame when the key is released
-//     //cancelAnimationFrame(animationFrameId);
-//     // clearInterval(movementInterval);
-// });
-
+//My original move function. Very sticky and unresponsive!
 
 // creates as listener for keydown, then calls the movePlayer function.
 document.addEventListener('keydown', movePlayer);
+document.addEventListener('keyup', stopPlayer);
+
+function stopPlayer () {
+    leftKeyDown = false;
+    rightKeyDown = false;
+    console.log("Key Up");
+    currentPosition[0] += 0;
+    drawPlayer();
+}
+
+
+function moveLeft (){
+  
+    if (currentPosition[0] > 0 && leftKeyDown == true) {
+        currentPosition[0] -= 10;   
+        drawPlayer();
+        setTimeout(moveLeft, 20);
+
+        //console.log("player moved left");
+    } else {
+        stopPlayer();
+    }
+}
+
+function moveRight (){
+       
+    if (currentPosition[0] < boardWidth - blockWidth && rightKeyDown == true) { 
+        currentPosition[0] += 10; 
+        drawPlayer();
+        setTimeout(moveRight, 20);
+        //console.log("player moved left");
+    } else {
+        stopPlayer();
+    }
+}
+
+function movePlayer(event) {
+    if (event.keyCode == 65) {
+        leftKeyDown = true;
+        moveLeft();       
+    }
+    if (event.keyCode == 68) {
+        rightKeyDown = true;
+        moveRight();
+        
+    } 
+}
+
+// function movePlayer(e) {d    
+//     switch(e.key) {
+//         case 'ArrowLeft': 
+//         case 'a':
+            // if (currentPosition[0] > 0) {
+            //     currentPosition[0] -= 10;   
+            //     drawPlayer();
+            //     //console.log("player moved left");
+// }
+
+//         case 'ArrowRight': 
+//         case 'd':    
+//             if (currentPosition[0] < boardWidth - blockWidth) { 
+//                 currentPosition[0] += 10; 
+//                 drawPlayer();
+//                 //console.log("player moved right");
+//             }           
+//             break;
+//     }
+// }
+
+
 
 // add ball 
-
 const ball = document.createElement("div");
 ball.classList.add("ball");
 drawTheBall();
@@ -201,14 +189,14 @@ function moveBall () {
     //Y axis
     ballCurrentPosition[1] += yDirection; 
     drawTheBall(); 
-    checkForCollisons();
+    checkForCollisions();
 } 
 
 // timer interval sets speed
 timerID = setInterval(moveBall, 10); 
 
 
-function checkForCollisons () {
+function checkForCollisions () {
     // check for block collisions 
     for (let i = 0; i < blocks.length; i++) {
         if (
@@ -264,8 +252,6 @@ if (
         //stops you being able to move the user
         document.removeEventListener("keydown");
     }
-
-
 }
 
 function changeDirection() { 
