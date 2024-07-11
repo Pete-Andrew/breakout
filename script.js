@@ -7,7 +7,6 @@ const boardWidth = 560;
 const boardHeight = 300;
 const ballDiameter = 20;
 
-
 let timerID;  //takes the ball speed and movement and wraps it in a setInterval()
 let xDirection = -2;
 let yDirection = 2;
@@ -90,12 +89,14 @@ function drawTheBall() {
     ball.style.bottom = ballCurrentPosition[1] + 'px';
 }
 
+//listens for keydown and keyup events
 document.addEventListener('keydown', movePlayer);
 document.addEventListener('keyup', stopPlayer);
 
+//stops the player on keyup event
 function stopPlayer(event) {
     if (event.keyCode == 65) {
-        clearInterval(leftInterval);
+        clearInterval(leftInterval); //The clearInterval method clears a timer set with the setInterval() method.
         leftKeyDown = false;
     }
     if (event.keyCode == 68) {
@@ -121,7 +122,9 @@ function moveRight() {
 function movePlayer(event) {
     if (event.keyCode == 65 && !leftKeyDown) {
         leftKeyDown = true;
-        leftInterval = setInterval(moveLeft, 25);
+        // The setInterval() method calls a function at specified intervals (in milliseconds), until clearInterval() is called or the window is closed.
+        // setInterval() differs from setTimeout() in that setTimeout() is called only once, If you need repeated executions, use setInterval() instead.
+        leftInterval = setInterval(moveLeft, 25); 
     }
     if (event.keyCode == 68 && !rightKeyDown) {
         rightKeyDown = true;
@@ -131,10 +134,11 @@ function movePlayer(event) {
 
 // add ball 
 const ball = document.createElement("div");
-ball.classList.add("ball");
+ball.classList.add("ball"); //adds the CSS to the const ball
 drawTheBall();
-grid.appendChild(ball);
+grid.appendChild(ball); //adds the ball to the grid (which is the main container element)
 
+// moves the ball and re-draws it, checks for collisions. 
 function moveBall() {
     ballCurrentPosition[0] += xDirection;
     ballCurrentPosition[1] += yDirection;
@@ -142,8 +146,10 @@ function moveBall() {
     checkForCollisions();
 }
 
+//
 timerID = setInterval(moveBall, ballSpeed);
 
+// checks for collisions with the blocks
 function checkForCollisions() {
     for (let i = 0; i < blocks.length; i++) {
         if (
@@ -152,7 +158,8 @@ function checkForCollisions() {
         ) {
             const allBlocks = Array.from(document.querySelectorAll(".block"));
             allBlocks[i].classList.remove("block")
-            blocks.splice(i, 1)
+            blocks.splice(i, 1) // Splice: Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements
+            // if contact has been made it changes the ball direction
             changeDirection()
             score++
             scoreDisplay.innerHTML = score;
@@ -180,6 +187,7 @@ function checkForCollisions() {
         changeDirection();
     }
 
+    //checks to see if the ball has hit the baseline, in which case you lose! 
     if (ballCurrentPosition[1] <= 0) {
         clearInterval(timerID);
         document.removeEventListener("keydown", movePlayer);
@@ -195,6 +203,7 @@ function checkForCollisions() {
     }
 }
 
+// takes care of the ball changing direction
 function changeDirection() {
     if (xDirection === 2 && yDirection == 2) {
         yDirection = -2;
