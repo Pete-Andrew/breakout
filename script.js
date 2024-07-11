@@ -78,6 +78,7 @@ player.classList.add("player");
 drawPlayer();
 grid.appendChild(player);
 
+// draws the player
 function drawPlayer() {
     player.style.left = currentPosition[0] + 'px';
     player.style.bottom = currentPosition[1] + 'px';
