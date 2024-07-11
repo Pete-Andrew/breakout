@@ -1,67 +1,77 @@
 const grid = document.querySelector(".grid");
-const scoreDisplay = document.querySelector("#score"); 
+const scoreDisplay = document.querySelector("#score");
 
 const blockWidth = 100;
-const blockHeight = 20; 
+const blockHeight = 20;
 const boardWidth = 560;
 const boardHeight = 300;
-const ballDiameter = 20; 
+const ballDiameter = 20;
 
-let timerID = 0;
+
+let timerID;  //takes the ball speed and movement and wraps it in a setInterval()
 let xDirection = -2;
 let yDirection = 2;
 let leftKeyDown = false;
 let rightKeyDown = false;
 
-let leftInterval;
+let leftInterval; //setInterval values for the movement (makes smooth movement for the player)
 let rightInterval;
 
 let score = 0;
+// set speeds 
+let ballSpeed = 10;
+let playerSpeed = 10;
 
 const playerStart = [230, 10];
 let currentPosition = playerStart;
 
-const ballStart = [270, 40];
+const ballStart = [270, 40]; //sets start point for ball, the first value is the x axis 
 let ballCurrentPosition = ballStart;
 
-// Create Block 
+// Creates a Block class that xAxis and yAxis can be passed into to define the blocks size 
 class Block {
     constructor(xAxis, yAxis) {
         this.bottomLeft = [xAxis, yAxis]
         this.bottomRight = [xAxis + blockWidth, yAxis]
         this.topLeft = [xAxis, yAxis + blockHeight]
         this.topRight = [xAxis + blockWidth, yAxis + blockHeight]
-    } 
-}
-
-const blocks = [
-    new Block(10,270),
-    new Block(120,270),
-    new Block(230,270),
-    new Block(340,270),
-    new Block(450,270),
-    new Block(10,240),
-    new Block(120,240),
-    new Block(230,240),
-    new Block(340,240),
-    new Block(450,240),   
-    new Block(10,210),
-    new Block(120,210),
-    new Block(230,210),
-    new Block(340,210),
-    new Block(450,210),
-]
-
-function addBlocks() {
-   for (let i = 0; i < blocks.length; i++) {
-        const block = document.createElement("div");
-        block.classList.add("block");
-        block.style.left = blocks[i].bottomLeft[0] + 'px';
-        block.style.bottom = blocks[i].bottomLeft[1] + 'px';
-        grid.appendChild(block); 
     }
 }
-addBlocks(); 
+
+//creates an array, each new Block creates a block using the block class and defines the co-ordinates
+const blocks = [
+    new Block(10, 270),
+    new Block(120, 270),
+    new Block(230, 270),
+    new Block(340, 270),
+    new Block(450, 270),
+    //row 2
+    new Block(10, 240),
+    new Block(120, 240),
+    new Block(230, 240),
+    new Block(340, 240),
+    new Block(450, 240),
+    //row 3
+    new Block(10, 210),
+    new Block(120, 210),
+    new Block(230, 210),
+    new Block(340, 210),
+    new Block(450, 210),
+
+]
+
+//addBlocks function takes the blocks array and creates a div (e.g. a block) for each block in the array
+function addBlocks() {
+    for (let i = 0; i < blocks.length; i++) {
+        const block = document.createElement("div");
+        block.classList.add("block"); // this adds a CSS class for the block element, in turn the .block CSS is then applied to each block with this class
+        block.style.left = blocks[i].bottomLeft[0] + 'px';
+        block.style.bottom = blocks[i].bottomLeft[1] + 'px';
+        //appends a block, this process is in a for loop so goes back to the start of this function until all the blocks are placed. 
+        grid.appendChild(block);
+    }
+}
+addBlocks();
 
 // add player
 const player = document.createElement("div");
@@ -77,7 +87,7 @@ function drawPlayer() {
 // draw the ball
 function drawTheBall() {
     ball.style.left = ballCurrentPosition[0] + 'px';
-    ball.style.bottom = ballCurrentPosition[1] + 'px'; 
+    ball.style.bottom = ballCurrentPosition[1] + 'px';
 }
 
 document.addEventListener('keydown', movePlayer);
@@ -96,14 +106,14 @@ function stopPlayer(event) {
 
 function moveLeft() {
     if (currentPosition[0] > 0 && leftKeyDown) {
-        currentPosition[0] -= 10;   
+        currentPosition[0] -= playerSpeed;
         drawPlayer();
     }
 }
 
 function moveRight() {
-    if (currentPosition[0] < boardWidth - blockWidth && rightKeyDown) { 
-        currentPosition[0] += 10; 
+    if (currentPosition[0] < boardWidth - blockWidth && rightKeyDown) {
+        currentPosition[0] += playerSpeed;
         drawPlayer();
     }
 }
@@ -116,23 +126,23 @@ function movePlayer(event) {
     if (event.keyCode == 68 && !rightKeyDown) {
         rightKeyDown = true;
         rightInterval = setInterval(moveRight, 25);
-    } 
+    }
 }
 
 // add ball 
 const ball = document.createElement("div");
 ball.classList.add("ball");
 drawTheBall();
-grid.appendChild(ball); 
+grid.appendChild(ball);
 
-function moveBall() { 
+function moveBall() {
     ballCurrentPosition[0] += xDirection;
-    ballCurrentPosition[1] += yDirection; 
-    drawTheBall(); 
+    ballCurrentPosition[1] += yDirection;
+    drawTheBall();
     checkForCollisions();
-} 
+}
 
-timerID = setInterval(moveBall, 10); 
+timerID = setInterval(moveBall, ballSpeed);
 
 function checkForCollisions() {
     for (let i = 0; i < blocks.length; i++) {
@@ -143,23 +153,23 @@ function checkForCollisions() {
             const allBlocks = Array.from(document.querySelectorAll(".block"));
             allBlocks[i].classList.remove("block")
             blocks.splice(i, 1)
-            changeDirection() 
-            score++ 
+            changeDirection()
+            score++
             scoreDisplay.innerHTML = score;
 
-            if (blocks.length === 0) { 
+            if (blocks.length === 0) {
                 scoreDisplay.innerHTML = "you win!!";
                 clearInterval(timerID);
                 document.removeEventListener('keydown', movePlayer);
             }
         }
     }
-    
+
     if (
-        ballCurrentPosition[0] >= (boardWidth - ballDiameter) || 
+        ballCurrentPosition[0] >= (boardWidth - ballDiameter) ||
         ballCurrentPosition[1] >= (boardHeight - ballDiameter) ||
-        ballCurrentPosition[0] <= 0 
-    ) { 
+        ballCurrentPosition[0] <= 0
+    ) {
         changeDirection()
     }
 
@@ -167,34 +177,44 @@ function checkForCollisions() {
         (ballCurrentPosition[0] > currentPosition[0] && ballCurrentPosition[0] < currentPosition[0] + blockWidth) &&
         (ballCurrentPosition[1] > currentPosition[1] && ballCurrentPosition[1] < currentPosition[1] + blockHeight)
     ) {
-        changeDirection(); 
+        changeDirection();
     }
 
     if (ballCurrentPosition[1] <= 0) {
-        clearInterval(timerID); 
-        scoreDisplay.innerHTML = "You lose!";
+        clearInterval(timerID);
         document.removeEventListener("keydown", movePlayer);
+        if (confirm("You Lose!" + "\n" + "Final score = " + score + "\n" + "Do you want to play again? Ok or Cancel")) {
+            // location.reload re-loads the page from the server. 
+            location.reload();
+        }
+        else {
+            scoreDisplay.innerHTML = "You lose!";
+            alert("No worries, better luck next time");
+            stopPlayer();
+        }
     }
 }
 
-function changeDirection() { 
+function changeDirection() {
     if (xDirection === 2 && yDirection == 2) {
         yDirection = -2;
-        return; 
+        return;
     }
-    
+
     if (xDirection === 2 && yDirection === -2) {
         xDirection = -2
-        return; 
+        return;
     }
-    
-    if(xDirection === -2 && yDirection === -2) {
+
+    if (xDirection === -2 && yDirection === -2) {
         yDirection = 2;
         return;
     }
 
-    if(xDirection === -2 && yDirection === 2) {
+    if (xDirection === -2 && yDirection === 2) {
         xDirection = 2;
         return;
     }
 }
+
+
